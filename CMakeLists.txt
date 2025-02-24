@@ -11,13 +11,21 @@ add_executable(tests
   src/allocator.hpp
   src/string.hpp
 )
-
 target_include_directories(tests
   PRIVATE
     src
 )
-
 target_link_libraries(tests
   PRIVATE
     ${GTEST_LIBRARIES}
+)
+
+add_executable(example
+  src/allocator.hpp
+  src/string.hpp
+  examples/example.cpp
+)
+target_include_directories(example
+  PRIVATE
+    src  
 )

@@ -2,6 +2,7 @@
 #define STRING_HPP
 
 #include <cstring>
+#include <iostream>
 #include <algorithm>
 
 #include "allocator.hpp"
@@ -11,6 +12,24 @@ class String
 public:
   using allocator_type = Allocator<char>;
   using size_type      = Allocator<char>::size_type;
+
+class iterator
+{
+public:
+  iterator(char * ptr);
+
+  char & operator *();
+  const char & operator *() const;
+
+  iterator & operator ++();
+  iterator & operator --();
+
+  bool operator ==(const iterator & rhs) const;
+  bool operator !=(const iterator & rhs) const;
+
+private:
+  char * ptr_;
+};
 
   explicit String(allocator_type alloc = allocator_type());
   String(size_type n, const allocator_type & alloc = allocator_type());
@@ -32,7 +51,12 @@ public:
 
   bool operator ==(const String & rhs) const;
 
+  bool operator <(const String & rhs) const;
+
   const char * data() const;
+
+  iterator begin();
+  iterator end();
 
   bool empty() const;
 
@@ -48,6 +72,38 @@ private:
   size_type      capacity_;
   char         * buffer_;
 };
+
+inline String::iterator::iterator(char * ptr) :
+  ptr_(ptr)
+{
+}
+
+inline char & String::iterator::operator *()
+{
+  return *ptr_;
+}
+
+inline String::iterator & String::iterator::operator ++()
+{
+  ++ptr_;
+  return *this;
+}
+
+inline String::iterator & String::iterator::operator --()
+{
+  --ptr_;
+  return *this;
+}
+
+inline bool String::iterator::operator ==(const iterator & rhs) const
+{
+  return ptr_ == rhs.ptr_;
+}
+
+inline bool String::iterator::operator !=(const iterator & rhs) const
+{
+  return ptr_ != rhs.ptr_;
+}
 
 inline String::String(allocator_type alloc) :
   alloc_(alloc),
@@ -188,9 +244,37 @@ inline bool String::operator ==(const String & rhs) const
         std::memcmp(buffer_, rhs.buffer_, length_) == 0;
 }
 
+inline bool String::operator <(const String & rhs) const
+{  
+  for (size_type i = 0; i < length_ && i < rhs.length_; ++i)
+  {
+    if (*(buffer_+i) < *(rhs.buffer_+i))
+      return true;
+    if (*(buffer_+i) > *(rhs.buffer_+i))
+      return false;
+  }
+  return length_ < rhs.length_;
+}
+
+inline std::ostream & operator <<(std::ostream & os, const String & rhs)
+{
+  os << rhs.data();
+  return os;
+}
+
 inline const char * String::data() const
 {
   return buffer_;
+}
+
+inline String::iterator String::begin()
+{
+  return iterator(buffer_);
+}
+
+inline String::iterator String::end()
+{
+  return iterator(buffer_+length_);
 }
 
 inline bool String::empty() const
