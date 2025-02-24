@@ -14,39 +14,39 @@ public:
   Allocator() = default;
   Allocator(const Allocator<T> &) {}
 
-  pointer allocate(size_type n);
+  pointer allocate(size_type n) const;
 
-  void deallocate(pointer ptr, size_type n);
+  void deallocate(pointer ptr, size_type n) const;
 
   template<class U, class ...Args>
-  void construct(U * ptr, Args && ...args);
+  void construct(U * ptr, Args && ...args) const;
 
   template<class U>
-  void destroy(U * ptr);
+  void destroy(U * ptr) const;
 };
 
 template<class T>
-typename Allocator<T>::pointer Allocator<T>::allocate(size_type n)
+typename Allocator<T>::pointer Allocator<T>::allocate(size_type n) const
 {
   return reinterpret_cast<pointer>(::operator new(n * sizeof(T)));
 }
 
 template<class T>
-void Allocator<T>::deallocate(pointer ptr, size_type n)
+void Allocator<T>::deallocate(pointer ptr, size_type n) const
 {
   ::operator delete(ptr);
 }
 
 template<class T>
 template<class U, class ...Args>
-void Allocator<T>::construct(U * ptr, Args && ...args)
+void Allocator<T>::construct(U * ptr, Args && ...args) const
 {
   ::new(reinterpret_cast<void*>(ptr)) U(std::forward<Args>(args)...);
 }
 
 template<class T>
 template<class U>
-void Allocator<T>::destroy(U * ptr)
+void Allocator<T>::destroy(U * ptr) const
 {
   ptr->~U();
 }

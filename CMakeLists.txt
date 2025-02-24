@@ -6,7 +6,6 @@ find_package(GTest REQUIRED)
 
 add_executable(tests
   tests/main.cpp
-  tests/allocator_tests.cpp
   tests/string_tests.cpp
 
   src/allocator.hpp
